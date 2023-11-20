@@ -1,16 +1,13 @@
-// Import the HelloWorld component
-import HelloWorld from './components/HelloWorld.js';
+import component1 from "./components/component1.js"
+import component2 from "./components/component2.js"
 
-// Create a new Vue instance
-new Vue({
+Vue.component('component1',component1)
+Vue.component('component2',component2)
+
+
+var app = new Vue({
   el: '#app',
-  template: `
-    <div>
-      <HelloWorld />
-    </div>
-  `,
-  // Register the HelloWorld component
-  components: {
-    HelloWorld,
+  data: {
+    message: 'Hello Shab!'
   },
-});
+})

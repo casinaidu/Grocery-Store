@@ -1,16 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Vue.js Example</title>
-  <!-- Vue.js CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
-  <script type="module" src="main.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
 </head>
 <body>
-  <div id="app"></div>
-  <!-- Main JavaScript file -->
-  <!-- <script src="main.js"></script> -->
+  <div id="app">
+    {{ message }}
+    <component1></component1>
+    <component2></component2>
+    <component1></component1>
+  </div>
 </body>
+<script type="module" src="main.js"></script>
 </html>
