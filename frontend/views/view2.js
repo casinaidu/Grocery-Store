@@ -4,4 +4,4 @@ const view2 = {
     `
   }
   
-  export default view2
+export default view2
