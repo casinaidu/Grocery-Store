@@ -3,6 +3,7 @@ from application.models import *
 from flask_security import auth_required
 from .database import db
 import string, random
+from datetime import datetime
 
 
 purchase_fields = {
@@ -62,7 +63,7 @@ user_parser.add_argument('password')
 user_parser.add_argument('role')
 
 
-class UserLoginAPI(Resource):
+class UserAPI(Resource):
     def get(self,email):
         user = User.query.filter_by(email=email).first()
         if not user:
@@ -79,6 +80,9 @@ class UserLoginAPI(Resource):
         fs_uniquifier = ''.join(random.choices(string.ascii_letters,k=10))
         if any(field is None for field in (email, name, password, role)):
             return {"message":"One or more fields are empty"}, 400
+        user_exist = User.query.filter_by(email=email).first()
+        if user_exist:
+            return {"message":"Email already exists"},400
         user = User(email=email, name=name, password=password, active=active, fs_uniquifier=fs_uniquifier, role=role)
         db.session.add(user)
         db.session.commit()
@@ -100,8 +104,8 @@ class CategoryAPI(Resource):
         name = args.get('name',None)
         if name is None:
             return {"message":"Name is required"}, 400
-        category = Category.query.filter_by(name=name).first()
-        if category:
+        category_exist = Category.query.filter_by(name=name).first()
+        if category_exist:
             return {"message":"Category already exists"}, 400
         category = Category(name=name)
         db.session.add(category)
@@ -126,7 +130,77 @@ class CategoryAPI(Resource):
             return {"message":"Name is required"}, 400
         category_exist = Category.query.filter_by(name=name).first()
         if category_exist and category_exist.id != category.id:
-            return {"message":"Name already exists"}, 400
+            return {"message":"Category already exists"}, 400
         category.name = name
         db.session.commit()
         return marshal(category, category_fields), 200
+
+class ProductAPI(Resource):
+    def get(self, id=None):
+        if id is None:
+            products = Product.query.all()
+            return marshal(products, product_fields), 200
+        product = Product.query.get(id)
+        if product:
+            return marshal(product, product_fields), 200
+        else:
+            return {"message":"Invalid ID"}, 404
+        
+    def post(self):
+        args = product_parser.parse_args()
+        name = args.get('name',None)
+        expiry = datetime.strptime(args.get('expiry',None),'%d/%m/%Y')
+        price = args.get('price',None)
+        unit = args.get('unit',None)
+        quantity = args.get('quantity',None)
+        category_id = args.get('category_id',None)
+        print(name, expiry, price, unit, quantity, category_id)
+        if any(field is None for field in (name, expiry, price, unit, quantity, category_id)):
+            return {"message":"One or more fields are empty"}, 400
+        category = Category.query.get(category_id)
+        if not category:
+            return {"message":"Category not exists"}, 400
+        product_exist = Product.query.filter_by(name=name, category_id=category_id).first()
+        if product_exist:
+            return {"message":"Product already exists in this category"}, 400
+        product = Product(name=name, expiry=expiry, price=price, unit=unit, quantity=quantity, category_id=category_id)
+        db.session.add(product)
+        db.session.commit()
+        return marshal(product, product_fields), 201
+    
+    def delete(self, id):
+        product = Product.query.get(id)
+        if not product:
+            return {"message":"Invalid ID"}, 404
+        db.session.delete(product)
+        db.session.commit()
+        return {"message":"Product deleted successfully"}, 200
+    
+    def put(self, id):
+        product = Product.query.get(id)
+        if not product:
+            return {"message":"Invalid ID"}, 404
+        args = product_parser.parse_args()
+        name = args.get('name',None)
+        expiry = datetime.strptime(args.get('expiry',None),'%d/%m/%Y')
+        price = args.get('price',None)
+        unit = args.get('unit',None)
+        quantity = args.get('quantity',None)
+        category_id = args.get('category_id',None)
+        if any(field is None for field in (name, expiry, price, unit, quantity, category_id)):
+            return {"message":"One or more fields are empty"}, 400
+        category = Category.query.get(category_id)
+        if not category:
+            return {"message":"Category not exists"}, 400
+        product_exist = Product.query.filter_by(name=name, category_id=category_id).first()
+        if product_exist and product_exist.id != product.id:
+            return {"message":"Product already exists in this category"}, 400
+        product.name = name
+        product.expiry = expiry
+        product.price = price
+        product.unit = unit
+        product.quantity = quantity
+        product.category_id = category_id
+        db.session.commit()
+        return marshal(product, product_fields), 200
+        

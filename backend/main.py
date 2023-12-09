@@ -62,10 +62,10 @@ def create_app():
 app, api, celery, cache = create_app()
 
 from application.api import *
-api.add_resource(UserLoginAPI, "/api/getuser/<email>", "/api/adduser")
+api.add_resource(UserAPI, "/api/getuser/<email>", "/api/adduser")
 api.add_resource(CategoryAPI, "/api/categories", "/api/category/<int:id>", "/api/category")
-# api.add_resource(ShowAdminAPI, "/api/getshow/<venue_id>","/api/addshow/<venue_id>","/api/editshow/<show_id>","/api/deleteshow/<show_id>")
-# api.add_resource(BookingAPI, "/api/addbooking/<user_id>/<venue_id>/<show_id>")
+api.add_resource(ProductAPI, "/api/products","/api/product/<int:id>","/api/product")
+api.add_resource(PurchaseAPI, "/api/purchases","/api/purchase/<int:id>","/api/purchase")
 # api.add_resource(ShowsAPI, "/api/getallshows")
 
 
