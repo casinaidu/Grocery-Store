@@ -204,3 +204,61 @@ class ProductAPI(Resource):
         db.session.commit()
         return marshal(product, product_fields), 200
         
+
+class PurchaseAPI(Resource):
+    def get(self, id=None):
+        if id is None:
+            purchases = Purchase.query.all()
+            return marshal(purchases, purchase_fields), 200
+        purchase = Purchase.query.get(id)
+        if purchase:
+            return marshal(purchase, purchase_fields), 200
+        else:
+            return {"message":"Invalid ID"}, 404
+        
+    def post(self):
+        args = purchase_parser.parse_args()
+        user_id = args.get('user_id',None)
+        product_id = args.get('product_id',None)
+        quantity = args.get('quantity',None)
+        purchased = bool(args.get('purchased',None))
+        if any(field is None for field in (user_id, product_id, quantity, purchased)):
+            return {"message":"One or more fields are empty"}, 400
+        user = User.query.get(user_id)
+        product = Product.query.get(product_id)
+        if not user or not product:
+            return {"message":"User or Product not exists"}, 400
+        purchase = Purchase(user_id=user_id, product_id=product_id, quantity=quantity, purchased=purchased)
+        db.session.add(purchase)
+        db.session.commit()
+        return marshal(purchase, purchase_fields), 201
+    
+    def delete(self, id):
+        purchase = Purchase.query.get(id)
+        if not purchase:
+            return {"message":"Invalid ID"}, 404
+        db.session.delete(purchase)
+        db.session.commit()
+        return {"message":"Purchase deleted successfully"}, 200
+    
+    def put(self, id):
+        purchase = Purchase.query.get(id)
+        if not purchase:
+            return {"message":"Invalid ID"}, 404
+        args = purchase_parser.parse_args()
+        user_id = args.get('user_id',None)
+        product_id = args.get('product_id',None)
+        quantity = args.get('quantity',None)
+        purchased = bool(args.get('purchased',None))
+        if any(field is None for field in (user_id, product_id, quantity, purchased)):
+            return {"message":"One or more fields are empty"}, 400
+        user = User.query.get(user_id)
+        product = Product.query.get(product_id)
+        if not user or not product:
+            return {"message":"User or Product not exists"}, 400
+        purchase.user_id = user_id
+        purchase.product_id = product_id
+        purchase.quantity = quantity
+        purchase.purchased = purchased
+        db.session.commit()
+        return marshal(purchase, purchase_fields), 200    
