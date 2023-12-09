@@ -61,10 +61,9 @@ def create_app():
 
 app, api, celery, cache = create_app()
 
-# Import all the controllers so they are loaded
-# from application.api import UserLoginAPI,VenueAdminAPI,ShowAdminAPI,BookingAPI,ShowsAPI
-# api.add_resource(UserLoginAPI, "/api/getuser/<email>","/api/adduser")
-# api.add_resource(VenueAdminAPI, "/api/getvenue","/api/addvenue","/api/editvenue/<venue_id>","/api/deletevenue/<venue_id>")
+from application.api import *
+api.add_resource(UserLoginAPI, "/api/getuser/<email>", "/api/adduser")
+api.add_resource(CategoryAPI, "/api/categories", "/api/category/<int:id>", "/api/category")
 # api.add_resource(ShowAdminAPI, "/api/getshow/<venue_id>","/api/addshow/<venue_id>","/api/editshow/<show_id>","/api/deleteshow/<show_id>")
 # api.add_resource(BookingAPI, "/api/addbooking/<user_id>/<venue_id>/<show_id>")
 # api.add_resource(ShowsAPI, "/api/getallshows")
@@ -72,4 +71,4 @@ app, api, celery, cache = create_app()
 
 if __name__ == '__main__':
   # Run the Flask app
-  app.run(host='0.0.0.0',port=8080)
+  app.run(host='0.0.0.0')
