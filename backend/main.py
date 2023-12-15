@@ -53,6 +53,10 @@ def create_app():
     )
 
     celery.Task = workers.ContextTask
+    CORS(app, supports_credentials=True)
+    CORS(app, resources={r"/api/*": {"origins": "*", "supports_credentials": True}})
+    app.config['CORS_HEADERS'] = 'application/json'
+
     app.app_context().push()
     cache = Cache(app)
     app.app_context().push()

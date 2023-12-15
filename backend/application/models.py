@@ -19,6 +19,11 @@ class User(db.Model, UserMixin):
     purchases = db.relationship('Purchase',backref='user',cascade='all,delete-orphan')
     carts = db.relationship('Cart',backref='user',cascade='all,delete-orphan')
 
+user_roles = db.Table('user_roles',
+    db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
+    db.Column('role_id', db.Integer(), db.ForeignKey('role.id'))
+)
+    
 class Category(db.Model):
     __tablename__ = 'category'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
